@@ -2,4 +2,22 @@
 title: Data Cleaning
 format: typst
 ---
+```{r}
+library(tidyverse)
+library(readxl)
+```
 
+```{r}
+svpre <- read.csv("data/g24_sov_by_g24_svprec.csv")
+
+svpre <- svpre |> #select the sv precinct cols of choice
+  select(c("COUNTY", "FIPS", "SVPREC", "ADDIST", "SVPREC_KEY", "ELECTION", "GEO_TYPE", "CDDIST", "SDDIST", "BEDIST", "TOTREG", "TOTVOTE", "ASSDEM01", "ASSDEM02", "ASSREP01", "ASSREP02", "CNGDEM01", "CNGDEM02", "CNGREP01", "CNGREP02", "PRSDEM01", "PRSREP01")) |>
+  filter(!str_detect(ASSDEM01, "[***]"))
+
+results <- read_excel("data/g24-results-by-district.xlsx")
+
+```
+
+```{r}
+write_csv(x = svpre, file = "data/svpre.csv")
+```
