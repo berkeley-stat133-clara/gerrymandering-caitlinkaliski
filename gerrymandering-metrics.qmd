@@ -5,7 +5,39 @@ format: typst
 
 ### 2024 Election Results and the 2024 District Map
 
+```{r}
 
+waste <- function(A, B) { #function takes two vectors, one for each party
+  
+  total_waste = c() #creates a vector to store the wasted votes for each district
+  
+  win_marks = c() #creates an vector to store the unique winning threshold for each district
+  
+  for (i in 1:length(A)) { #iterates through the number of districts
+    win_mark = floor((A[i] + B[i]) / 2) + 1 #calculates the winning threshold for each district
+    win_marks = c(win_marks, win_mark) #adds to the vector of winning thresholds to have one for each district
+  }
+    
+  for (i in 1:length(A)) { 
+    if (A[i] > B[i]) { #if party A vote is greater than party B, this if statement will calculate the wasted vote
+    waste = A[i] - win_marks[i] #wasted votes are party A votes - winning threshold
+    total_waste = c(total_waste, waste) #add waste votes to the storage vector
+    } else { #if party A didn't win
+      waste = A[i] #all of the votes are wasted and added as an element to the waste vector
+      total_waste = c(total_waste, waste)
+    }
+  }
+  return(total_waste) #returns a vector of waste votes for each district for one party
+}
 
+EG <- function(A, B) { #this function takes two party votes again for each district
+  wasteA = waste(A, B) #calculates the waste votes in each district for one party
+  wasteB = waste(B, A) #calculates the waste votes for the other party
+  
+  EG = (sum(wasteA) - sum(wasteB)) / (sum(A) + sum(B)) #calculates the EG = total waste votes across party A and B / total votes of A and B
+  
+  return(EG) #returns the proportion of wasted votes
+}
+```
 ### 2024 Election Results and the proposed 2025 District Map
 
