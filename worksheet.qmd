@@ -9,14 +9,14 @@ Recall the 3 quantitative approaches to measuring gerrymandering discussed in le
 3. Ensembles / Extreme Outliers\
 Use the following table to practice applying the first two techniques.\
 
-| District | D Votes | R Votes | Result  |
-|:---------:|:-------:|:-------:|:--------|
-| 1 | 62 | 38 | D wins |
-| 2 | 55 | 45 | D wins |
-| 3 | 44 | 56 | R wins |
-| 4 | 47 | 53 | R wins |
-| 5 | 46 | 54 | R wins |
-| **Total** | **254** | **246** |          |
+| District  | D Votes | R Votes | Result |
+|:---------:|:-------:|:-------:|:-------|
+|     1     |   62    |   38    | D wins |
+|     2     |   55    |   45    | D wins |
+|     3     |   44    |   56    | R wins |
+|     4     |   47    |   53    | R wins |
+|     5     |   46    |   54    | R wins |
+| **Total** | **254** | **246** |        |
 
 ```{r}
 #| message: false
@@ -34,6 +34,18 @@ Calculate the mean-median score associated with this particular district breakdo
 
 ```{r}
 # add code for Q1 here
+dem_votes <- votes$d_votes / (votes$d_votes + votes$r_votes)
+dem_mean <- mean(dem_votes)
+dem_med <- median(dem_votes)
+dem_mm <- dem_mean - dem_med
+
+rep_votes <- votes$r_votes / (votes$r_votes + votes$d_votes)
+rep_mean <- mean(rep_votes)
+rep_med <- median(rep_votes)
+rep_mm <- rep_mean - rep_med
+
+print(paste0("The Democratic mean-median score is ", dem_mm))
+print(paste0("The Republican mean-median score is ", rep_mm))
 ```
 
 ### Q2. Efficiency Gap
@@ -42,7 +54,45 @@ Calculate the Efficiency Gap (EG) associated with this particular district break
 
 *Tip*: it may be helpful to write a function that takes a vector of votes across districts for party A and vector of votes for the party B and returns a vector of the number votes wasted by party A across districts.
 
-
 ```{r}
 # add code for Q2 here
+waste <- function(A, B) { #function takes two vectors, one for each party
+  
+  total_waste = c() #creates a vector to store the wasted votes for each district
+  
+  win_marks = c() #creates an vector to store the unique winning threshold for each district
+  
+  for (i in 1:length(A)) { #iterates through the number of districts
+    win_mark = floor((A[i] + B[i]) / 2) + 1 #calculates the winning threshold for each district
+    win_marks = c(win_marks, win_mark) #adds to the vector of winning thresholds to have one for each district
+  }
+    
+  for (i in 1:length(A)) { 
+    if (A[i] > B[i]) { #if party A vote is greater than party B, this if statement will calculate the wasted vote
+    waste = A[i] - win_marks[i] #wasted votes are party A votes - winning threshold
+    total_waste = c(total_waste, waste) #add waste votes to the storage vector
+    } else { #if party A didn't win
+      waste = A[i] #all of the votes are wasted and added as an element to the waste vector
+      total_waste = c(total_waste, waste)
+    }
+  }
+  return(total_waste) #returns a vector of waste votes for each district for one party
+}
+
+EG <- function(A, B) { #this function takes two party votes again for each district
+  wasteA = waste(A, B) #calculates the waste votes in each district for one party
+  wasteB = waste(B, A) #calculates the waste votes for the other party
+  
+  EG = (sum(wasteA) - sum(wasteB)) / (sum(A) + sum(B)) #calculates the EG = total waste votes across party A and B / total votes of A and B
+  
+  return(EG) #returns the proportion of wasted votes
+}
+```
+
+```{r}
+waste(votes$d_votes, votes$r_votes)
+```
+
+```{r}
+EG(votes$d_votes, votes$r_votes)
 ```

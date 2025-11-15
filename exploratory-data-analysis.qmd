@@ -2,14 +2,26 @@
 title: Exploratory Data Analysis
 format: typst
 ---
-
+```{r}
+svpre <- read.csv("data/svpre.csv")
+```
 ### Question 1
 
-Put your question here.
+What was the distribution of DEM to REP Votes in CA for the Presidential Election?
 
 ### Answer 1
 
-Put your answer here.
+```{r}
+svpre |>
+  select(PRSDEM01, PRSREP01, COUNTY) |>
+  summarize(voteDEM = sum(PRSDEM01),
+            voteREP = sum(PRSREP01), .by = COUNTY) |>
+  ggplot(aes(x = voteDEM, y = voteREP)) +
+  geom_point() +
+  scale_y_log10() +
+  scale_x_log10() +
+  labs(title = "Scatterplot of CA votes by county for President")
+```
 
 ### Question 2
 
